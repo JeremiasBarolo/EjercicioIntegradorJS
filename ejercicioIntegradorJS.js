@@ -8,9 +8,9 @@ El código contiene
 El código tiene errores y varias cosas para mejorar / agregar
 ​
 Ejercicios
-1) Arreglar errores existentes en el código
-2) Agregar la función eliminarProducto a la clase Carrito
-3) Utilizar la función eliminarProducto utilizando .then() y .catch()
+1) Arreglar errores existentes en el código (hecho)
+2) Agregar la función eliminarProducto a la clase Carrito (hecho)
+3) Utilizar la función eliminarProducto utilizando .then() y .catch() (hecho)
 ​
 */
 
@@ -95,29 +95,14 @@ class Carrito {
         const PRODUCTOS_CARRITO = this.productos
 
 
-        // Creamos un producto relleno para poder hacer un forEach y validamos que no se repita
-        const nuevoProducto1 = new ProductoEnCarrito('AAA', 'AAA', 0)
-        
-        if(PRODUCTOS_CARRITO.length >= 1){
-        }else{
-            PRODUCTOS_CARRITO.push(nuevoProducto1);
-        }
-        
-        
-
-        //Creamos un array con los sku registrados para su validacion
-        let skuRegistrados = []
-        PRODUCTOS_CARRITO.forEach(productoCarrito => {
-            skuRegistrados.push(productoCarrito.sku);
-        
-        });
-            //comprobamos si el Sku existe. Si existe, sumamos las cantidades....
-            if(skuRegistrados.includes(Sku)){
-                console.log('ya existe otro producto');
+        //Validamos si existe el Sku
+        let skuExistentes = this.productos.some(productosku => productosku.sku === Sku);
+            if(skuExistentes){ // si existe, sumamos las cantidades...
+                console.log('ya existe este sku...');
                 let productoDelCarrito = PRODUCTOS_CARRITO.find(producto => producto.sku === Sku);
                 productoDelCarrito.cantidad += cantidad
                 console.log(carrito);
-            }else
+            }else{
                 // Y si no existe, lo creamos.
                 console.log('cree un nuevo producto...');
                 const nuevoProducto = new ProductoEnCarrito(Sku, PRODUCTO.nombre, cantidad);
@@ -133,7 +118,7 @@ class Carrito {
             }
 
 
-
+    }
 
 
     // 2) Agregar la función eliminarProducto a la clase Carrito
@@ -147,7 +132,7 @@ class Carrito {
 
 
     /**
-     * función que elimina @{cantidad} de productos con @{sku} al carrito
+     * función que elimina @{cantidad} de productos con @{sku} del carrito
      */
 
     async eliminarProducto(Sku, cantidad){
@@ -155,14 +140,6 @@ class Carrito {
         //Constante de Productos en carrito
         const PRODUCTOS_CARRITO = this.productos
 
-
-        const nuevoProducto1 = new ProductoEnCarrito('AAA', 'AAA', 10)
-        if(PRODUCTOS_CARRITO.length >= 1){
-            console.log()
-        }else{
-            PRODUCTOS_CARRITO.push(nuevoProducto1);
-        }
-        
     
         const PRODUCTO = await encontrarProducto(Sku, PRODUCTOS_CARRITO)
         //then y catch
@@ -234,34 +211,22 @@ function encontrarProducto(Sku, PRODUCTOS_CARRITO){
         setTimeout(() => {
             // Busco el producto en la "carrito"
             let productoEncontrado = PRODUCTOS_CARRITO.find(producto => producto.sku === Sku);
-            //Si lo encuentra...carrito.agregarProducto('WE328NJ', 4);
+            //Si lo encuentra...
             if (productoEncontrado) {
                 resolve(productoEncontrado) //devuelve el producto
             } else {
-            reject(`Error: No se encontro el Producto ${Sku}`); // Rechaza la promesa con un mensaje de error
+                reject(`Error: No se encontro el Producto ${Sku}`); // Rechaza la promesa con un mensaje de error
             }
         }, 1500);
         
     });
 }
 
-// function procesarDatos(PRODUCTO, cantidad){
-//     setTimeout(() => {
-//         const RESULTADO = PRODUCTO.cantidad - cantidad
-//             if(RESULTADO > 0){
-//                 return PRODUCTO.cantidad - cantidad
-//             }else{
-//                 return PRODUCTO.cantidad = RESULTADO
-//             }
-//     }, 1500);
-    
-// }
-
 
 // ejecucion del programa
 const carrito = new Carrito();
 carrito.agregarProducto('WE328NJ', 4);
-//carrito.eliminarProducto('WE328NJ', 2);
+carrito.eliminarProducto('WE328NJ', 2);
 carrito.agregarProducto('KS944RUR', 4);
 carrito.agregarProducto('WE328NJ', 4);
 
