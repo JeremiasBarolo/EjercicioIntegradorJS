@@ -31,16 +31,14 @@ class Producto {
         this.categoria = categoria;
         this.precio = precio;
 
-        // Si no me definen stock, pongo 10 por default
+        // Si no me definen stock, pongo 10 por defecto
         if (stock) {
             this.stock = stock;
         } else {
             this.stock = 10;
         }
     }
-
 }
-
 
 // Creo todos los productos que vende mi super
 const queso = new Producto('KS944RUR', 'Queso', 10, 'lacteos', 4);
@@ -55,53 +53,62 @@ const jabon = new Producto('WE328NJ', 'Jabon', 4, 'higiene', 3);
 // Genero un listado de productos. Simulando base de datos
 const productosDelSuper = [queso, gaseosa, cerveza, arroz, fideos, lavandina, shampoo, jabon];
 
-
 // Cada cliente que venga a mi super va a crear un carrito
 class Carrito {
     productos;      // Lista de productos agregados
     categorias;     // Lista de las diferentes categorías de los productos en el carrito
     precioTotal;    // Lo que voy a pagar al finalizar mi compra
 
-    // Al crear un carrito, empieza vació
+    // Al crear un carrito, empieza vacío
     constructor() {
         this.productos = [];
         this.categorias = [];
         this.precioTotal = 0;
     }
 
-
-
-    //  1) Arreglar errores existentes en el código
-    // (hecho) a) Al ejecutar agregarProducto 2 veces con los mismos valores debería agregar 1 solo producto con la suma de las cantidades.    
-    // (hecho) b) Al ejecutar agregarProducto debería actualizar la lista de categorías solamente si la categoría no estaba en la lista.
-    // (hecho) c) Si intento agregar un producto que no existe debería mostrar un mensaje de error.
-
+    // 1) Arreglar errores existentes en el código
+    // a) Al ejecutar agregarProducto 2 veces con los mismos valores debería agregar 1 solo producto con la suma de las cantidades.
+    // b) Al ejecutar agregarProducto debería actualizar la lista de categorías solamente si la categoría no estaba en la lista.
+    // c) Si intento agregar un producto que no existe debería mostrar un mensaje de error.
 
     /**
-     * función que agrega @{cantidad} de productos con @{sku} al carrito
+     * Función que agrega @{cantidad} de productos con @{sku} al carrito
      */
-    
-  
     async agregarProducto(Sku, cantidad) {
         console.log(`Agregando ${cantidad} con el identificador ${Sku}`);
 
-        
         // Busco el producto en la "base de datos"
-        const PRODUCTO = await findProductBySku(Sku); 
+        const PRODUCTO = await findProductBySku(Sku);
         console.log("Producto encontrado", PRODUCTO);
 
 
-        //constante de productos dentro del carrito
+        //Constante de productos dentro del carrito
         const PRODUCTOS_CARRITO = this.productos
+
+
+        // Validacion de Stock/Cantidad
+        let cantidadRestanteStock = await validarCantidadStock(cantidad, PRODUCTO.stock);  
+        try {
+            if(cantidadRestanteStock){
+                PRODUCTO.stock = cantidadRestanteStock
+                console.log('paso');
+            }
+        } catch (error) {
+            console.log('ocurrio un error: ', error);
+        }
+
 
 
         //Validamos si existe el Sku
         let skuExistentes = this.productos.some(productosku => productosku.sku === Sku);
             if(skuExistentes){ // si existe, sumamos las cantidades...
                 console.log('ya existe este sku...');
-                let productoDelCarrito = PRODUCTOS_CARRITO.find(producto => producto.sku === Sku);
-                productoDelCarrito.cantidad += cantidad
-                console.log(carrito);
+                let productoDelCarrito = PRODUCTOS_CARRITO.find(producto => producto.sku === Sku); // Aqui instanciamos el Producto requerido
+
+                
+                
+            
+
             }else{
                 // Y si no existe, lo creamos.
                 console.log('cree un nuevo producto...');
@@ -116,6 +123,9 @@ class Carrito {
                 }
                     
             }
+                
+                
+        
 
 
     }
@@ -164,11 +174,11 @@ class Carrito {
         
         
     }
-}
+
 
 
     
-
+}
     
 
 
@@ -222,12 +232,26 @@ function encontrarProducto(Sku, PRODUCTOS_CARRITO){
     });
 }
 
+// Funcion para validar cantidad en stock
+function validarCantidadStock(canReq, stock) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log('Calculando stock restante....');
+            if (canReq > stock) {
+                reject(`Error: solo dispone de ${stock} en Stock`);
+            } else {
+                let cantidadRestante = stock - canReq;
+                resolve(cantidadRestante);
+            }
+        }, 1500);
+    });
+}
 
 // ejecucion del programa
 const carrito = new Carrito();
-carrito.agregarProducto('WE328NJ', 4);
-carrito.eliminarProducto('WE328NJ', 2);
-carrito.agregarProducto('KS944RUR', 4);
-carrito.agregarProducto('WE328NJ', 4);
+carrito.agregarProducto('WE328NJ', 1);
+carrito.agregarProducto('WE328NJ', 2);
+// carrito.agregarProducto('KS944RUR', 4);
+// carrito.agregarProducto('WE328NJ', 4);
 
 
